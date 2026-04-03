@@ -1,8 +1,7 @@
 package routes
 
 import (
-	"url_shortener/internal/middleware"
-
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 )
 
@@ -11,10 +10,16 @@ type Routes interface {
 }
 
 func RegisterRoutes(r *gin.Engine, routes ...Routes) {
-	r.Use(middleware.LoggerMiddleware(), middleware.ApiKeyMiddleware(), middleware.AuthMiddleWare(), middleware.RateLimiterMiddleware())
+	r.Use(gzip.Gzip(gzip.DefaultCompression))
 	api := r.Group("/api/v1")
-
 	for _, route := range routes {
 		route.Register(api)
 	}
+	//Throw the error if use wrong method for the routes
+	r.NoRoute(func(ctx *gin.Context) {
+		ctx.JSON(404, gin.H{
+			"Error": "Not Found",
+			"path":  ctx.Request.URL.Path,
+		})
+	})
 }

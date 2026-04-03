@@ -3,3 +3,5 @@
 *.env.local
 !.env.example
 logs
+.air.toml
+./tmp/main

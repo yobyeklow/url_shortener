@@ -1,13 +1,20 @@
 package app
 
 import (
+	"context"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 	"url_shortener/internal/config"
+	"url_shortener/internal/database"
+	"url_shortener/internal/database/sqlc"
 	"url_shortener/internal/routes"
 	"url_shortener/internal/validation"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lpernett/godotenv"
 )
 
 type Module interface {
@@ -18,17 +25,28 @@ type Application struct {
 	router  *gin.Engine
 	modules []Module
 }
+type ModuleContext struct {
+	db sqlc.Querier
+}
 
 func NewApplication(cfg *config.Config) *Application {
 	if err := validation.InitValidator(); err != nil {
 		log.Fatalf("Validator init failed %v", err)
 	}
 	r := gin.Default()
-	loadEnv()
-	modules := []Module{
-		NewUserModule(),
+	//Connect DB
+	if err := database.InitDB(); err != nil {
+		log.Fatalf("Database init failed %v", err)
 	}
-	routes.RegisterRoutes(r, getModuleRoute(modules)...)
+	// redisClient := config.NewRedisClient()
+	ctx := &ModuleContext{
+		db: database.DB,
+	}
+	modules := []Module{
+		NewUserModule(ctx),
+	}
+
+	routes.RegisterRoutes(r, getModulesRoute(modules)...)
 	return &Application{
 		router:  r,
 		cfg:     cfg,
@@ -36,18 +54,34 @@ func NewApplication(cfg *config.Config) *Application {
 	}
 }
 func (app *Application) Run() error {
-	return app.router.Run(app.cfg.ServerAddress)
+	server := &http.Server{
+		Addr:    app.cfg.Address,
+		Handler: app.router,
+	}
+	quitSrv := make(chan os.Signal, 1)
+	// syscall.SIGNINT -> Ctrl + C -> End  Process
+	// syscall.SIGTERM -> Kill Service
+	// syscall.SIGHUP -> Reload Service
+	signal.Notify(quitSrv, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	go func() {
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("Failed to start server %v", err)
+		}
+	}()
+	<-quitSrv
+	log.Println("Shutdown signal received!")
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server forced to shutdown: %v", err)
+	}
+	log.Println("Server shutdown!")
+	return nil
 }
-func getModuleRoute(modules []Module) []routes.Routes {
+func getModulesRoute(modules []Module) []routes.Routes {
 	routeList := make([]routes.Routes, len(modules))
 	for i, module := range modules {
 		routeList[i] = module.Routes()
 	}
 	return routeList
-}
-func loadEnv() {
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 }

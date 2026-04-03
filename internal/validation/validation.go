@@ -67,7 +67,7 @@ func HandleValidationErrors(err error) gin.H {
 				allowedValues := strings.Join(strings.Split(e.Param(), " "), ",")
 				errors[fieldPath] = fmt.Sprintf("%s must be one of the values: %s", fieldPath, allowedValues)
 			case "required":
-				errors[fieldPath] = fmt.Sprintf("%s is force", fieldPath)
+				errors[fieldPath] = fmt.Sprintf("%s is required", fieldPath)
 			case "search":
 				errors[fieldPath] = fmt.Sprintf("%s can only contain lowercase letters, uppercase, numbers và blank", fieldPath)
 			case "email":
@@ -75,7 +75,7 @@ func HandleValidationErrors(err error) gin.H {
 			case "datetime":
 				errors[fieldPath] = fmt.Sprintf("%s should be format YYYY-MM-DD", fieldPath)
 			case "email_advanced":
-				errors[fieldPath] = fmt.Sprintf("%s is on the blacklist", fieldPath)
+				errors[fieldPath] = fmt.Sprintf("%s is on the email blacklist", fieldPath)
 			case "password_strong":
 				errors[fieldPath] = fmt.Sprintf("%s must contain at least 8 characters, including (lowercase letters, uppercase letters, numbers, and special characters)", fieldPath)
 			case "file_ext":
@@ -89,7 +89,7 @@ func HandleValidationErrors(err error) gin.H {
 	}
 
 	return gin.H{
-		"error":  "Yêu cầu không hợp lệ",
+		"error":  "Something is wrong!",
 		"detail": err.Error(),
 	}
 }
