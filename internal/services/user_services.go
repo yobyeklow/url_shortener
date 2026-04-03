@@ -110,3 +110,30 @@ func (us *userService) RestoreUser(ctx *gin.Context, userUuid uuid.UUID) (sqlc.U
 	}
 	return userData, nil
 }
+func (us *userService) GetAllUser(ctx *gin.Context, search string, page int32, limit int32, orderBy string, sort string, deleted bool) ([]sqlc.User, int32, error) {
+	context := ctx.Request.Context()
+	if sort == "" {
+		sort = "desc"
+	}
+	if orderBy == "" {
+		orderBy = "user_id"
+	}
+	if limit <= 0 {
+		envLimit := utils.GetEnvInt("LIMIT_ITEM_ON_PER_PAGE", 10)
+		limit = int32(envLimit)
+	}
+	if page <= 0 {
+		page = 1
+	}
+
+	offset := (page - 1) * limit
+	usersData, err := us.user_repo.GetUserAll(context, search, page, limit, orderBy, sort, offset, deleted)
+	if err != nil {
+		return []sqlc.User{}, 0, utils.WrapError("Failed to fetch users", utils.ErrCodeInternal, err)
+	}
+	total, err := us.user_repo.CountUsers(context, search, deleted)
+	if err != nil {
+		return []sqlc.User{}, 0, utils.WrapError("Failed to count users", utils.ErrCodeInternal, err)
+	}
+	return usersData, int32(total), nil
+}

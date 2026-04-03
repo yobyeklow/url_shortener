@@ -35,6 +35,32 @@ func (q *Queries) CleanSoftDelete(ctx context.Context, userUuid uuid.UUID) (User
 	return i, err
 }
 
+const countRecords = `-- name: CountRecords :one
+SELECT count(*)
+FROM users
+WHERE (
+    $1::bool IS NULL
+    OR (user_deleted_at IS NOT NULL AND $1::bool IS TRUE)
+    OR (user_deleted_at IS NULL AND $1::bool IS FALSE)
+) AND (
+    $2::TEXT IS NULL
+    OR $2::TEXT = ''
+    OR user_email ILIKE '%' || $2 || '%'
+    OR user_fullname ILIKE '%' || $2 || '%')
+`
+
+type CountRecordsParams struct {
+	Deleted *bool  `json:"deleted"`
+	Search  string `json:"search"`
+}
+
+func (q *Queries) CountRecords(ctx context.Context, arg CountRecordsParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countRecords, arg.Deleted, arg.Search)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO users(
     user_email,

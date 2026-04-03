@@ -137,3 +137,33 @@ func (uh *UserHandler) GetUserByUUID(ctx *gin.Context) {
 	userDTO := dto.MapToUserDTO(userData)
 	utils.ResponseSuccess(ctx, http.StatusOK, "Fetched user data successfully!", userDTO)
 }
+func (uh *UserHandler) GetAllUser(ctx *gin.Context) {
+	var lookupInput dto.GetSearchParams
+	if err := ctx.ShouldBindQuery(&lookupInput); err != nil {
+		utils.ResponseWValidator(ctx, validation.HandleValidationErrors(err))
+		return
+	}
+	users, totalRecords, err := uh.service.GetAllUser(ctx, lookupInput.Search, lookupInput.Page, lookupInput.Limit, lookupInput.Order, lookupInput.Sort, false)
+	if err != nil {
+		utils.ResponseError(ctx, err)
+		return
+	}
+	usersDTO := dto.MapUsersToDTO(users)
+	paginationResp := utils.NewPaginationResponse(usersDTO, lookupInput.Page, lookupInput.Limit, totalRecords)
+	utils.ResponseSuccess(ctx, http.StatusOK, "Fetched all of users succesfully!", paginationResp)
+}
+func (uh *UserHandler) GetSoftDeleteUsers(ctx *gin.Context) {
+	var lookupInput dto.GetSearchParams
+	if err := ctx.ShouldBindQuery(&lookupInput); err != nil {
+		utils.ResponseWValidator(ctx, validation.HandleValidationErrors(err))
+		return
+	}
+	users, totalRecords, err := uh.service.GetAllUser(ctx, lookupInput.Search, lookupInput.Page, lookupInput.Limit, lookupInput.Order, lookupInput.Sort, true)
+	if err != nil {
+		utils.ResponseError(ctx, err)
+		return
+	}
+	usersDTO := dto.MapUsersToDTO(users)
+	paginationResp := utils.NewPaginationResponse(usersDTO, lookupInput.Page, lookupInput.Limit, totalRecords)
+	utils.ResponseSuccess(ctx, http.StatusOK, "Fetched all of delete users succesfully!", paginationResp)
+}
