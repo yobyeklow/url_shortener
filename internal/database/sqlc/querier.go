@@ -14,6 +14,7 @@ type Querier interface {
 	CleanSoftDelete(ctx context.Context, userUuid uuid.UUID) (User, error)
 	CountRecords(ctx context.Context, arg CountRecordsParams) (int64, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	GetUserByEmail(ctx context.Context, userEmail string) (User, error)
 	GetUserByUUID(ctx context.Context, userUuid uuid.UUID) (User, error)
 	RestoreUser(ctx context.Context, userUuid uuid.UUID) (User, error)
 	SoftDeleteUser(ctx context.Context, userUuid uuid.UUID) (User, error)

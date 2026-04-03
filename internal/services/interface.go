@@ -16,3 +16,8 @@ type UserServices interface {
 	CleanSoftDelete(ctx *gin.Context, userUuid uuid.UUID) error
 	RestoreUser(ctx *gin.Context, userUuid uuid.UUID) (sqlc.User, error)
 }
+type AuthServices interface {
+	Login(ctx *gin.Context, email string, password string) (string, string, int, error)
+	Logout(ctx *gin.Context, refreshTokenStr string) error
+	RefreshToken(ctx *gin.Context, refreshTokenStr string) (string, string, int, error)
+}

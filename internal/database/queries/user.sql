@@ -44,7 +44,7 @@ SELECT *
 FROM users
 WHERE
     user_uuid = sqlc.arg(user_uuid)::uuid
-    AND user_deleted_at IS NULL;
+    AND user_deleted_at IS NOT NULL;
 -- name: CountRecords :one
 SELECT count(*)
 FROM users
@@ -57,3 +57,7 @@ WHERE (
     OR sqlc.narg(search)::TEXT = ''
     OR user_email ILIKE '%' || sqlc.narg(search) || '%'
     OR user_fullname ILIKE '%' || sqlc.narg(search) || '%');
+-- name: GetUserByEmail :one
+SELECT *
+FROM users
+WHERE user_email = sqlc.arg(user_email)::TEXT AND user_deleted_at IS NOT NULL;

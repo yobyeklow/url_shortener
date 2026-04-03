@@ -13,6 +13,8 @@ import (
 	"url_shortener/internal/database/sqlc"
 	"url_shortener/internal/routes"
 	"url_shortener/internal/validation"
+	"url_shortener/pkg/auth"
+	"url_shortener/pkg/cache"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,12 +40,15 @@ func NewApplication(cfg *config.Config) *Application {
 	if err := database.InitDB(); err != nil {
 		log.Fatalf("Database init failed %v", err)
 	}
-	// redisClient := config.NewRedisClient()
+	redisClient := config.NewRedisClient()
+	cacheRedis := cache.NewRedisCacheService(redisClient)
+	tokenService := auth.NewJWTService(cacheRedis)
 	ctx := &ModuleContext{
 		db: database.DB,
 	}
 	modules := []Module{
 		NewUserModule(ctx),
+		NewAuthModule(ctx, tokenService, cacheRedis),
 	}
 
 	routes.RegisterRoutes(r, getModulesRoute(modules)...)

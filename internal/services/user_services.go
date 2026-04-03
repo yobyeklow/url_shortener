@@ -137,3 +137,11 @@ func (us *userService) GetAllUser(ctx *gin.Context, search string, page int32, l
 	}
 	return usersData, int32(total), nil
 }
+func (us *userService) GetUserByEmail(ctx *gin.Context, email string) (sqlc.User, error) {
+	context := ctx.Request.Context()
+	userData, err := us.user_repo.GetUserByEmail(context, email)
+	if err != nil {
+		return sqlc.User{}, utils.WrapError("Failed to fetch user by email", utils.ErrCodeInternal, err)
+	}
+	return userData, nil
+}

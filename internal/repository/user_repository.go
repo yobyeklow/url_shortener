@@ -122,3 +122,10 @@ func (ur *SQLUserRepository) CountUsers(ctx context.Context, search string, dele
 	}
 	return total, nil
 }
+func (ur *SQLUserRepository) GetUserByEmail(ctx context.Context, email string) (sqlc.User, error) {
+	userData, err := ur.db.GetUserByEmail(ctx, email)
+	if err != nil {
+		return sqlc.User{}, err
+	}
+	return userData, nil
+}

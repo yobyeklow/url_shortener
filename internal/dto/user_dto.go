@@ -21,6 +21,7 @@ type UserInput struct {
 	Status   int32  `json:"status" binding:"omitempty,oneof=1 2 3"`
 	Role     int32  `json:"role" binding:"omitempty,oneof=1 2 3"`
 }
+
 type GetUserByUuidParam struct {
 	Uuid string `uri:"uuid" binding:"uuid"`
 }

@@ -13,6 +13,7 @@ type UserRepository interface {
 	RestoreUser(ctx context.Context, userUuid uuid.UUID) (sqlc.User, error)
 	GetUserByUUID(ctx context.Context, userUuid uuid.UUID) (sqlc.User, error)
 	GetUserAll(ctx context.Context, search string, page int32, limit int32, orderBy string, sort string, offset int32, deleted bool) ([]sqlc.User, error)
+	GetUserByEmail(ctx context.Context, email string) (sqlc.User, error)
 	SoftDeleteUser(ctx context.Context, userUuid uuid.UUID) (sqlc.User, error)
 	CleanSoftDelete(ctx context.Context, userUuid uuid.UUID) (sqlc.User, error)
 	CountUsers(ctx context.Context, search string, deleted bool) (int64, error)
