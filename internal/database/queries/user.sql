@@ -44,7 +44,7 @@ SELECT *
 FROM users
 WHERE
     user_uuid = sqlc.arg(user_uuid)::uuid
-    AND user_deleted_at IS NOT NULL;
+    AND user_deleted_at IS NULL;
 -- name: CountRecords :one
 SELECT count(*)
 FROM users
@@ -60,4 +60,4 @@ WHERE (
 -- name: GetUserByEmail :one
 SELECT *
 FROM users
-WHERE user_email = sqlc.arg(user_email)::TEXT AND user_deleted_at IS NOT NULL;
+WHERE user_email = sqlc.arg(user_email)::TEXT AND user_deleted_at IS NULL;

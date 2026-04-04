@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -32,7 +31,6 @@ func GetEnvInt(key string, defaultValue int) int {
 }
 func NewLoggerWithPath(fileName string, level string) *zerolog.Logger {
 	cwd, err := os.Getwd()
-	fmt.Println(cwd)
 	if err != nil {
 		log.Fatal("❌ Unable to get working dir:", err)
 	}
