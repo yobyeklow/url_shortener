@@ -19,8 +19,8 @@ var DB sqlc.Querier
 
 func InitDB() error {
 	connectStr := config.NewConfig().DNS()
-	path := "../../internal/logs/sql.log"
-	sqlLogger := utils.NewLoggerWithPath(path, "info")
+
+	sqlLogger := utils.NewLoggerWithPath("sql.log", "info")
 	conf, err := pgxpool.ParseConfig(connectStr)
 
 	if err != nil {

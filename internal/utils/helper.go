@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -29,20 +30,22 @@ func GetEnvInt(key string, defaultValue int) int {
 	}
 	return intVal
 }
-func NewLoggerWithPath(path string, level string) *zerolog.Logger {
+func NewLoggerWithPath(fileName string, level string) *zerolog.Logger {
 	cwd, err := os.Getwd()
+	fmt.Println(cwd)
 	if err != nil {
-		log.Fatal("Unable to get working dir:", err)
+		log.Fatal("❌ Unable to get working dir:", err)
 	}
-	path = filepath.Join(cwd, "internal/logs/", path)
+	logDir := filepath.Join(cwd, "..", "..", "internal/logs/", fileName)
+
 	config := logger.LoggerConfig{
-		Filename:   path,
-		MaxSize:    1, // megabytes
-		MaxBackups: 5,
-		MaxAge:     5, //days
-		Compress:   true,
 		Level:      level,
-		IsDev:      GetEnv("APP_STATUS", "development"),
+		Filename:   logDir,
+		MaxSize:    1,
+		MaxBackups: 5,
+		MaxAge:     5,
+		Compress:   true,
+		IsDev:      GetEnv("APP_EVN", "development"),
 	}
 	return logger.NewLogger(config)
 }

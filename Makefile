@@ -26,7 +26,6 @@ migrate-goto:
 migrate-check-version:
 	migrate -path=$(pwd)./internal/database/migrations -database "$(CONNECTION_STR)" version
 dev:
-	docker compose -f $(DEV_COMPOSE) down
 	docker compose -f $(DEV_COMPOSE) --env-file $(ENV_FILE) up --build
 stop-dev:
 	docker compose -f $(DEV_COMPOSE) down

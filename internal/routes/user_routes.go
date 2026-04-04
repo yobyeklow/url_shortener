@@ -2,6 +2,7 @@ package routes
 
 import (
 	"url_shortener/internal/handler"
+	"url_shortener/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,16 +19,18 @@ func NewUserRoutes(handler *handler.UserHandler) *UserRoutes {
 
 func (userRoute *UserRoutes) Register(r *gin.RouterGroup) {
 	users := r.Group("/users")
+	users.POST("/create", userRoute.handler.Create)
+	private := users.Group("")
+	private.Use(middleware.AuthMiddleware())
 	{
-		users.GET("/:uuid", userRoute.handler.GetUserByUUID)
-		users.GET("/", userRoute.handler.GetAllUser)
-		users.GET("/soft-delete", userRoute.handler.GetSoftDeleteUsers)
+		private.GET("/:uuid", userRoute.handler.GetUserByUUID)
+		private.GET("/", userRoute.handler.GetAllUser)
+		private.GET("/soft-delete", userRoute.handler.GetSoftDeleteUsers)
 
-		users.POST("/create", userRoute.handler.Create)
-		users.PUT("/:uuid", userRoute.handler.Update)
-		users.PUT("/:uuid/restore", userRoute.handler.RestoreUser)
+		private.PUT("/:uuid", userRoute.handler.Update)
+		private.PUT("/:uuid/restore", userRoute.handler.RestoreUser)
 
-		users.DELETE("/:uuid", userRoute.handler.SoftDelteUser)
-		users.DELETE("/:uuid/clean", userRoute.handler.DeleteUser)
+		private.DELETE("/:uuid", userRoute.handler.SoftDelteUser)
+		private.DELETE("/:uuid/clean", userRoute.handler.DeleteUser)
 	}
 }
