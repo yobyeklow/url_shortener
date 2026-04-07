@@ -12,23 +12,24 @@ import (
 )
 
 type Url struct {
-	UrlID  int32 `json:"url_id"`
-	UserID int32 `json:"user_id"`
+	UrlID    int32     `json:"url_id"`
+	UserUuid uuid.UUID `json:"user_uuid"`
 	// Random Key: This column contain the key to make URL shortner complex than
-	RandomKey            string    `json:"random_key"`
-	DefaultFallbackUrl   string    `json:"default_fallback_url"`
-	HashedValueUrl       *string   `json:"hashed_value_url"`
-	IosDeepLink          string    `json:"ios_deep_link"`
-	IosFallbackUrl       string    `json:"ios_fallback_url"`
-	AndroidDeepLink      string    `json:"android_deep_link"`
-	AndroidFallbackUrl   string    `json:"android_fallback_url"`
-	WebhookUrl           string    `json:"webhook_url"`
-	OpengraphTitle       *string   `json:"opengraph_title"`
-	OpengraphDescription string    `json:"opengraph_description"`
-	OpengraphImage       string    `json:"opengraph_image"`
-	IsActive             bool      `json:"is_active"`
-	UrlCreatedAt         time.Time `json:"url_created_at"`
-	UrlUpdatedAt         time.Time `json:"url_updated_at"`
+	RandomKey            string             `json:"random_key"`
+	DefaultFallbackUrl   string             `json:"default_fallback_url"`
+	HashedValueUrl       *string            `json:"hashed_value_url"`
+	IosDeepLink          string             `json:"ios_deep_link"`
+	IosFallbackUrl       string             `json:"ios_fallback_url"`
+	AndroidDeepLink      string             `json:"android_deep_link"`
+	AndroidFallbackUrl   string             `json:"android_fallback_url"`
+	WebhookUrl           string             `json:"webhook_url"`
+	OpengraphTitle       *string            `json:"opengraph_title"`
+	OpengraphDescription string             `json:"opengraph_description"`
+	OpengraphImage       string             `json:"opengraph_image"`
+	IsActive             bool               `json:"is_active"`
+	UrlCreatedAt         time.Time          `json:"url_created_at"`
+	UrlUpdatedAt         time.Time          `json:"url_updated_at"`
+	UrlDeletedAt         pgtype.Timestamptz `json:"url_deleted_at"`
 }
 
 type User struct {

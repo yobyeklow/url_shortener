@@ -18,3 +18,7 @@ type UserRepository interface {
 	CleanSoftDelete(ctx context.Context, userUuid uuid.UUID) (sqlc.User, error)
 	CountUsers(ctx context.Context, search string, deleted bool) (int64, error)
 }
+type UrlRepository interface {
+	CreateUrl(ctx context.Context, arg sqlc.CreateUrlParams) (sqlc.Url, error)
+	FindUrlByHashed(ctx context.Context, hashedValueUrl string) (sqlc.Url, error)
+}

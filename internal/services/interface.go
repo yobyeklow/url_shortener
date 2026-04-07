@@ -21,3 +21,7 @@ type AuthServices interface {
 	Logout(ctx *gin.Context, refreshTokenStr string) error
 	RefreshToken(ctx *gin.Context, refreshTokenStr string) (string, string, int, error)
 }
+type UrlServices interface {
+	CreateUrl(ctx *gin.Context, arg sqlc.CreateUrlParams) (sqlc.Url, bool, error)
+	MergeShortKey(randKey string, id int32) string
+}

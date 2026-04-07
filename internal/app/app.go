@@ -47,8 +47,9 @@ func NewApplication(cfg *config.Config) *Application {
 		db: database.DB,
 	}
 	modules := []Module{
-		NewUserModule(ctx),
+		NewUserModule(ctx, redisClient),
 		NewAuthModule(ctx, tokenService, cacheRedis),
+		NewUrlModule(ctx, redisClient),
 	}
 
 	routes.RegisterRoutes(r, tokenService, cacheRedis, getModulesRoute(modules)...)
