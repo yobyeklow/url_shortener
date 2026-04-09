@@ -53,6 +53,8 @@ func HandleValidationErrors(err error) gin.H {
 				errors[fieldPath] = fmt.Sprintf("%s must be less than or equal to %s", fieldPath, e.Param())
 			case "uuid":
 				errors[fieldPath] = fmt.Sprintf("%s must be a valid UUID", fieldPath)
+			case "short_key":
+				errors[fieldPath] = fmt.Sprintf("%s must be a valid ShortKey", fieldPath)
 			case "slug":
 				errors[fieldPath] = fmt.Sprintf("%s can only contain lowercase letters, numbers, hyphens, or periods.", fieldPath)
 			case "min":

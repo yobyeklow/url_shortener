@@ -146,6 +146,9 @@ func (us *userService) GetAllUser(ctx *gin.Context, search string, page int32, l
 		Users []sqlc.User `json:"users"`
 		Total int32       `json:"total"`
 	}
+	if err := us.cache.Get(cacheKey, &cacheData); err == nil && cacheData.Users != nil {
+		return cacheData.Users, cacheData.Total, nil
+	}
 	if sort == "" {
 		sort = "desc"
 	}
@@ -169,8 +172,7 @@ func (us *userService) GetAllUser(ctx *gin.Context, search string, page int32, l
 	if err != nil {
 		return []sqlc.User{}, 0, utils.WrapError("Failed to count users", utils.ErrCodeInternal, err)
 	}
-	//Get data to Redit
-	cacheKey = generateCacheKey(search, page, limit, orderBy, sort, deleted)
+	//Save data to Redit
 	cacheData = struct {
 		Users []sqlc.User `json:"users"`
 		Total int32       `json:"total"`

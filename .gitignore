@@ -4,4 +4,4 @@
 !.env.example
 logs
 .air.toml
-/tmp
+tmp/

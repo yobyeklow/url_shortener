@@ -93,4 +93,28 @@ func RegisterCustomValidation(v *validator.Validate) {
 
 		return false
 	})
+	v.RegisterValidation("file_ext", func(fl validator.FieldLevel) bool {
+		filename := fl.Field().String()
+
+		allowedStr := fl.Param()
+		if allowedStr == "" {
+			return false
+		}
+
+		allowedExt := strings.Fields(allowedStr)
+		ext := strings.TrimPrefix(strings.ToLower(filepath.Ext(filename)), ".")
+
+		for _, allowed := range allowedExt {
+			if ext == strings.ToLower(allowed) {
+				return true
+			}
+		}
+
+		return false
+	})
+
+	v.RegisterValidation("short_key", func(fl validator.FieldLevel) bool {
+		shortKey := fl.Field().String()
+		return len(shortKey) >= 5 && len(shortKey) <= 20
+	})
 }

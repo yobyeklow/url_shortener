@@ -4,8 +4,10 @@ import (
 	"crypto/rand"
 	"encoding/binary"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,6 +18,8 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/zeebo/xxh3"
 )
+
+const base62Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 func GetEnv(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
@@ -40,8 +44,7 @@ func NewLoggerWithPath(fileName string, level string) *zerolog.Logger {
 	if err != nil {
 		log.Fatal("❌ Unable to get working dir:", err)
 	}
-	logDir := filepath.Join(cwd, "..", "..", "internal/logs/", fileName)
-
+	logDir := filepath.Join(cwd, "internal/logs/", fileName)
 	config := logger.LoggerConfig{
 		Level:      level,
 		Filename:   logDir,
@@ -49,9 +52,15 @@ func NewLoggerWithPath(fileName string, level string) *zerolog.Logger {
 		MaxBackups: 5,
 		MaxAge:     5,
 		Compress:   true,
-		IsDev:      GetEnv("APP_EVN", "development"),
+		IsDev:      GetEnv("APP_STATUS", "develope"),
 	}
 	return logger.NewLogger(config)
+}
+func Min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 func GenerateRandomKey(length int) string {
 	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -68,7 +77,6 @@ func Base62Encode(num int32) string {
 	if num == 0 {
 		return "0"
 	}
-	const base62Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	var sb strings.Builder
 	for num > 0 {
 		remainder := num % 62
@@ -110,4 +118,29 @@ func GenerateHashedValue(
 	binary.LittleEndian.PutUint64(buf[8:16], hash.Hi)
 
 	return hex.EncodeToString(buf)
+}
+func DecodeBase62(s string) (int32, error) {
+	if s == "" {
+		return 0, errors.New("empty string")
+	}
+	var result int32 = 0
+	for i := 0; i < len(s); i++ {
+		char := s[i]
+		var value int32
+		switch {
+		case char >= '0' && char <= '9':
+			value = int32(char - '0')
+		case char >= 'A' && char <= 'Z':
+			value = int32(char-'A') + 10
+		case char >= 'a' && char <= 'z':
+			value = int32(char-'a') + 36
+		default:
+			return 0, errors.New("invalid character in base62 string")
+		}
+		if result > (math.MaxInt32-value)/62 {
+			return 0, errors.New("overflow: value exceeds int32 range")
+		}
+		result = result*62 + value
+	}
+	return result, nil
 }

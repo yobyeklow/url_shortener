@@ -26,6 +26,7 @@ func (w *CustomResponseWriter) Write(data []byte) (n int, err error) {
 
 func LoggerMiddleware(httpLogger *zerolog.Logger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+
 		start := time.Now()
 		contentType := ctx.GetHeader("Content-Type")
 		requestBody := make(map[string]any)

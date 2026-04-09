@@ -19,6 +19,7 @@ type Config struct {
 }
 
 func NewConfig() *Config {
+	addr := os.Getenv("SERVER_HOST") + ":" + os.Getenv("SERVER_PORT")
 	return &Config{
 		DB: DataBaseConfig{
 			Host:     os.Getenv("DB_HOST"),
@@ -28,7 +29,7 @@ func NewConfig() *Config {
 			DBName:   os.Getenv("DB_NAME"),
 			SSLMode:  os.Getenv("DB_SSLMODE"),
 		},
-		Address: "localhost:8080",
+		Address: addr,
 	}
 }
 

@@ -22,6 +22,7 @@ type AuthServices interface {
 	RefreshToken(ctx *gin.Context, refreshTokenStr string) (string, string, int, error)
 }
 type UrlServices interface {
-	CreateUrl(ctx *gin.Context, arg sqlc.CreateUrlParams) (sqlc.Url, bool, error)
-	MergeShortKey(randKey string, id int32) string
+	CreateUrl(ctx *gin.Context, arg sqlc.CreateUrlParams) (sqlc.Url, string, bool, error)
+	DecryptShortKey(ctx *gin.Context, shortKey string) (sqlc.Url, error)
+	FindUrlById(ctx *gin.Context, id int32) (sqlc.Url, error)
 }

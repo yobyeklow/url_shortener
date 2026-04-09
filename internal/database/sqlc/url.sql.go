@@ -110,3 +110,35 @@ func (q *Queries) FindUrlByHashed(ctx context.Context, hashedValueUrl string) (U
 	)
 	return i, err
 }
+
+const findUrlById = `-- name: FindUrlById :one
+SELECT url_id, user_uuid, random_key, default_fallback_url, hashed_value_url, ios_deep_link, ios_fallback_url, android_deep_link, android_fallback_url, webhook_url, opengraph_title, opengraph_description, opengraph_image, is_active, url_created_at, url_updated_at, url_deleted_at
+FROM urls
+WHERE url_id = $1 AND url_deleted_at IS NULL AND is_active IS true
+LIMIT 1
+`
+
+func (q *Queries) FindUrlById(ctx context.Context, urlID int32) (Url, error) {
+	row := q.db.QueryRow(ctx, findUrlById, urlID)
+	var i Url
+	err := row.Scan(
+		&i.UrlID,
+		&i.UserUuid,
+		&i.RandomKey,
+		&i.DefaultFallbackUrl,
+		&i.HashedValueUrl,
+		&i.IosDeepLink,
+		&i.IosFallbackUrl,
+		&i.AndroidDeepLink,
+		&i.AndroidFallbackUrl,
+		&i.WebhookUrl,
+		&i.OpengraphTitle,
+		&i.OpengraphDescription,
+		&i.OpengraphImage,
+		&i.IsActive,
+		&i.UrlCreatedAt,
+		&i.UrlUpdatedAt,
+		&i.UrlDeletedAt,
+	)
+	return i, err
+}

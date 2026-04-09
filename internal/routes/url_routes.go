@@ -21,6 +21,7 @@ func (urlRoute *UrlRoutes) Register(r *gin.RouterGroup) {
 	urls := r.Group("/urls")
 	urls.Use(middleware.AuthMiddleware())
 	{
+		urls.GET("/:short_key", urlRoute.handler.DecryptShortKey)
 		urls.POST("", urlRoute.handler.CreateShortUrl)
 	}
 }

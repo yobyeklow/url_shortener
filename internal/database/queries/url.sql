@@ -14,3 +14,8 @@ SELECT *
 FROM urls
 WHERE hashed_value_url = sqlc.arg(hashed_value_url)::TEXT AND url_deleted_at IS NULL
 LIMIT 1;
+-- name: FindUrlById :one
+SELECT *
+FROM urls
+WHERE url_id = sqlc.arg(url_id) AND url_deleted_at IS NULL AND is_active IS true
+LIMIT 1;

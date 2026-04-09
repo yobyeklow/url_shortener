@@ -28,3 +28,10 @@ func (ur *SQLUrlRepository) FindUrlByHashed(ctx context.Context, hashedValueUrl 
 	}
 	return urlData, nil
 }
+func (ur *SQLUrlRepository) FindUrlById(ctx context.Context, id int32) (sqlc.Url, error) {
+	urlData, err := ur.db.FindUrlById(ctx, id)
+	if err != nil {
+		return sqlc.Url{}, err
+	}
+	return urlData, nil
+}

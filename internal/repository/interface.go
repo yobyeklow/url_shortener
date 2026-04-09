@@ -21,4 +21,5 @@ type UserRepository interface {
 type UrlRepository interface {
 	CreateUrl(ctx context.Context, arg sqlc.CreateUrlParams) (sqlc.Url, error)
 	FindUrlByHashed(ctx context.Context, hashedValueUrl string) (sqlc.Url, error)
+	FindUrlById(ctx context.Context, id int32) (sqlc.Url, error)
 }

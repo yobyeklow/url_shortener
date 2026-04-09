@@ -16,6 +16,7 @@ type Querier interface {
 	CreateUrl(ctx context.Context, arg CreateUrlParams) (Url, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	FindUrlByHashed(ctx context.Context, hashedValueUrl string) (Url, error)
+	FindUrlById(ctx context.Context, urlID int32) (Url, error)
 	GetUserByEmail(ctx context.Context, userEmail string) (User, error)
 	GetUserByUUID(ctx context.Context, userUuid uuid.UUID) (User, error)
 	RestoreUser(ctx context.Context, userUuid uuid.UUID) (User, error)

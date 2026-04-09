@@ -48,7 +48,7 @@ func NewLogger(config LoggerConfig) *zerolog.Logger {
 	}
 	zerolog.SetGlobalLevel(level)
 	var writter io.Writer
-	if config.IsDev == "developmenet" {
+	if config.IsDev == "develope" {
 		writter = PrettyJSONWriter{Writer: os.Stdout}
 	} else {
 		writter = &lumberjack.Logger{

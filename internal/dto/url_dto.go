@@ -17,8 +17,25 @@ type UrlInput struct {
 	OpengraphDescription string  `json:"opengraph_description" binding:"omitempty"`
 	OpengraphImage       string  `json:"opengraph_image" binding:"omitempty"`
 }
+type UrlCacheData struct {
+	UrlID              int32  `json:"url_id"`
+	RandomKey          string `json:"random_key"`
+	IosDeepLink        string `json:"ios_deep_link"`
+	IosFallbackUrl     string `json:"ios_fallback_url"`
+	AndroidDeepLink    string `json:"android_deep_link"`
+	AndroidFallbackUrl string `json:"android_fallback_link"`
+	DefaultFallbackUrl string `json:"default_fallback_url"`
+	WebhookUrl         string `json:"webhook_url"`
+	OgTitle            string `json:"og_title"`
+	OgDescription      string `json:"og_description"`
+	OgImageUrl         string `json:"og_image_url"`
+	IsActive           bool   `json:"is_active"`
+}
 type UrlDTO struct {
-	ShortKey string `json:"short_key"`
+	DefaultFallbackUrl string `json:"default_fallback_url"`
+}
+type ParamsShortKey struct {
+	ShortKey string `uri:"short_key" binding:"required,short_key"`
 }
 
 func (input *UrlInput) MapCreateInputToModel(randomKey string, hashed_value *string, userUUID uuid.UUID) sqlc.CreateUrlParams {
@@ -37,11 +54,4 @@ func (input *UrlInput) MapCreateInputToModel(randomKey string, hashed_value *str
 		IsActive:             true,
 		UserUuid:             userUUID,
 	}
-}
-func MapToUrlDTO(shortKey string) *UrlDTO {
-	dto := &UrlDTO{
-		ShortKey: shortKey,
-	}
-
-	return dto
 }
