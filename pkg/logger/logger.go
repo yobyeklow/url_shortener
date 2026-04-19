@@ -31,6 +31,9 @@ type PrettyJSONWriter struct {
 	Writer io.Writer
 }
 
+func InitLogger(config LoggerConfig) {
+	Log = NewLogger(config)
+}
 func (w PrettyJSONWriter) Write(p []byte) (n int, err error) {
 	var prettyJson bytes.Buffer
 
@@ -48,7 +51,7 @@ func NewLogger(config LoggerConfig) *zerolog.Logger {
 	}
 	zerolog.SetGlobalLevel(level)
 	var writter io.Writer
-	if config.IsDev == "develope" {
+	if config.IsDev == "developement" {
 		writter = PrettyJSONWriter{Writer: os.Stdout}
 	} else {
 		writter = &lumberjack.Logger{

@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,6 +14,7 @@ import (
 	"url_shortener/internal/validation"
 	"url_shortener/pkg/auth"
 	"url_shortener/pkg/cache"
+	"url_shortener/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,12 +33,12 @@ type ModuleContext struct {
 
 func NewApplication(cfg *config.Config) *Application {
 	if err := validation.InitValidator(); err != nil {
-		log.Fatalf("Validator init failed %v", err)
+		logger.Log.Fatal().Err(err).Msg("Validator init failed %v")
 	}
 	r := gin.Default()
 	//Connect DB
 	if err := database.InitDB(); err != nil {
-		log.Fatalf("Database init failed %v", err)
+		logger.Log.Fatal().Err(err).Msg("Database init failed %v")
 	}
 	redisClient := config.NewRedisClient()
 	cacheRedis := cache.NewRedisCacheService(redisClient)
@@ -69,19 +69,20 @@ func (app *Application) Run() error {
 	// syscall.SIGTERM -> Kill Service
 	// syscall.SIGHUP -> Reload Service
 	signal.Notify(quitSrv, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	logger.Log.Info().Msgf("Server is running at %s", app.cfg.Address)
 	go func() {
 		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatalf("Failed to start server %v", err)
+			logger.Log.Fatal().Err(err).Msg("Failed to start server %v")
 		}
 	}()
 	<-quitSrv
-	log.Println("Shutdown signal received!")
+	logger.Log.Info().Msg("Shutdown signal received!")
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
-		log.Fatalf("Server forced to shutdown: %v", err)
+		logger.Log.Fatal().Err(err).Msg("Server forced to shutdown: %v")
 	}
-	log.Println("Server shutdown!")
+	logger.Log.Info().Msg("Server shutdown!")
 	return nil
 }
 func getModulesRoute(modules []Module) []routes.Routes {

@@ -3,11 +3,11 @@ package database
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 	"url_shortener/internal/config"
 	"url_shortener/internal/database/sqlc"
 	"url_shortener/internal/utils"
+	"url_shortener/pkg/logger"
 	"url_shortener/pkg/pgx"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -51,6 +51,7 @@ func InitDB() error {
 	if err := DBPool.Ping(ctx); err != nil {
 		return fmt.Errorf("DB Ping error: %v", err)
 	}
-	log.Println("Connected Database successfully!")
+
+	logger.Log.Info().Msg("Connected Database successfully!")
 	return nil
 }

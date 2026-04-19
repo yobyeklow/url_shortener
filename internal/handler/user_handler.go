@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"url_shortener/internal/dto"
 	"url_shortener/internal/services"
@@ -51,6 +52,11 @@ func (uh *UserHandler) Update(ctx *gin.Context) {
 	var userInput dto.UpdateUserRequest
 	if err := ctx.ShouldBindJSON(&userInput); err != nil {
 		utils.ResponseWValidator(ctx, validation.HandleValidationErrors(err))
+		return
+	}
+	userRole, _ := ctx.Get("user_role")
+	if userRole == 1 && userInput.Role != nil && userInput.Status != nil {
+		utils.ResponseError(ctx, fmt.Errorf("User does not have the permission to do this!"))
 		return
 	}
 	userUpdateInput := userInput.MapUpdateInputToModel(userUuid)

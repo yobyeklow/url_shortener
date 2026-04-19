@@ -4,12 +4,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"time"
 	"url_shortener/internal/database/sqlc"
 	"url_shortener/internal/repository"
 	"url_shortener/internal/utils"
 	"url_shortener/pkg/cache"
+	"url_shortener/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
@@ -44,7 +44,7 @@ func (us *urlService) CreateUrl(ctx *gin.Context, arg sqlc.CreateUrlParams) (sql
 			if err != nil {
 				return sqlc.Url{}, "", false, utils.WrapError("Race condition: URL not found after conflict", utils.ErrCodeConflict, err)
 			}
-			shortKey = mergeShortKey(urlData.RandomKey, int32(urlData.UrlID))
+			shortKey = mergeShortKey(urlExisted.RandomKey, int32(urlExisted.UrlID))
 			return urlExisted, shortKey, true, nil
 		}
 
@@ -122,7 +122,8 @@ func (us *urlService) DecryptShortKey(ctx *gin.Context, shortKey string) (sqlc.U
 		Url: urlData,
 	}
 	if err = us.cache.Set(cacheKey, cacheData, 5*time.Minute); err != nil {
-		log.Printf("Failed to save data to Redis: %v", err)
+
+		logger.Log.Warn().Err(err).Msg("Failed to save data to Redis")
 	}
 
 	return urlData, nil
